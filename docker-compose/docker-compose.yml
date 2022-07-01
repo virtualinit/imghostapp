@@ -1,0 +1,20 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    environment:
+      POSTGRES_DB: imagestore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  imghostapp:
+    build:
+      context: ./imghostapp
+    image: imghostapp:latest
+    environment:
+      DATABASE_HOST: database
+    ports:
+      - 8080:8080
+    entrypoint: ["wait-for-it.sh", "database:5432", "--", "imghostapp.sh"]
+    depends_on:
+      - database

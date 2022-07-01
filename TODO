@@ -1,0 +1,54 @@
+Assumption
+----------
+- Users upload images of reasonable sizes.
+    - Requirements do not include image size restrictions.
+
+To Do
+-----
+- [x] Setup basic working Django app with DRF, tests and logging.
+- [x] Setup admin panel. And "createuser" management command.
+- [x] Enable authenticated user to upload and list images.
+        - Using ModelSerializer and rest_framework DefaultRouter.
+- [x] Create ImageThumbnailSize, AccountTiers and Subscription Models.
+        - Auto populate account tier data using migrations.
+- [x] Add them to admin. Hence admin can create arbitrary plans. (acc tiers)
+        - And add subscription for users.
+- [x] Easy to run project: docker-compose.
+- [x] Address review comments around URLs, models and serializers.
+- [x] Show download image URL for subscribed users.
+- [x] Extend image upload service to respond users with thumbnail URLs.
+        - Image processing.
+- [x] Implement expiring links feature and respond users with image temp URL.
+- [x] Performance consideration: Setup API caching.
+
+Another Approaches
+------------------
+- Implement ModelViewSet actions like create, retrieve, list for an image.
+    - models.ImageField provides download_url however not sure if we expose that outside for security reasons.
+        - creating a different download url and translating that to the image, may help keeping a layer inbetween.
+        - managing dynamic urls for the uploaded images could also be an option.
+            - would require an additional model though.
+- Thumbnail URLs could be implemented using URL kwargs.
+    - However, Basic account tier users have access to 200px thumbnail but not the original file.
+
+Further Code Changes
+--------------------
+- Logging could be made little more generic in BaseViewMixin.
+- Messages being sent to user could be wrapped for Localization.
+- Views.py could be made slimmer by
+    - moving _populate_image_urls to SubscriptionManager.
+    - helper methods to make downloadable image and thumbnails ready.
+- More exception raising and handling. Error messages. Few more test cases.
+
+Further Performance considerations
+----------------------------------
+- Large images should be stored/retrieved in chunks.
+    - There could be considerations around image storage.
+- Image thumbnails could be created at the time of image upload also. (by some background task etc.)
+    - That would be faster in retrievals.
+- Image BLOB chunks could also be stored in db, for having failsafe.
+    - db replication would help recovering it, if any.
+
+Security consideration
+----------------------
+- Good to scan uploading images using some Vision APIs.
